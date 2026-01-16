@@ -1,29 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Augmented Reality</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Augmented Reality</title>
+  <link rel="stylesheet" href="style.css">
 
-
+  <!-- QR Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
+
 <body>
-    <header id="header">
-        <span>Scan the Qr code</span>
-    </header>
 
-    <main>
+<header id="header">
+  <span>Scan the QR code</span>
+</header>
 
-        
+<main>
 
-        
+  <button type="button" id="openCam">Open camera</button>
 
-    </main>
+  <!-- Camera preview -->
+  <div id="preview"></div>
 
+</main>
+
+<script>
+const openBtn = document.getElementById("openCam");
+let scanner;
+
+openBtn.addEventListener("click", () => {
+  scanner = new Html5Qrcode("preview");
+
+  scanner.start(
+    { facingMode: "environment" }, // back camera
+    {
+      fps: 10,
+      qrbox: 500
+    },
+    qrCodeMessage => {
+      console.log("QR Detected:", qrCodeMessage);
+
+      scanner.stop().then(() => {
+        window.location.href = qrCodeMessage;
+      });
+    },
+    error => {
+      // ignore scan errors
+    }
+  );
+});
+</script>
 
 </body>
-
-
-
 </html>

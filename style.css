@@ -14,6 +14,10 @@ header{
     gap: 15px;
 }
 
+#preview {
+      width: 100vw;
+      height: 100vh;
+    }
 
 
 
