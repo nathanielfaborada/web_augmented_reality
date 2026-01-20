@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tl">
 <head>
   <meta charset="UTF-8">
-  <title>Object Recognition AR</title>
+  <title>AI Object Info (Tagalog)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- TensorFlow.js -->
+  <!-- TensorFlow -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
 
@@ -14,19 +14,21 @@
       margin: 0;
       overflow: hidden;
       background: black;
+      font-family: Arial, sans-serif;
     }
     video, canvas {
       position: absolute;
       top: 0;
       left: 0;
     }
-    #label {
+    #info {
       position: fixed;
-      top: 10px;
+      bottom: 0;
       width: 100%;
-      text-align: center;
+      background: rgba(0,0,0,0.75);
       color: white;
-      font-size: 18px;
+      padding: 14px;
+      font-size: 16px;
       z-index: 10;
     }
   </style>
@@ -34,57 +36,72 @@
 
 <body>
 
-<div id="label">Point the camera at an object</div>
 <video id="video" autoplay playsinline></video>
 <canvas id="canvas"></canvas>
+<div id="info">Itutok ang camera sa isang bagay</div>
 
 <script>
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const infoBox = document.getElementById("info");
 
-  async function setupCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment' }
-    });
-    video.srcObject = stream;
-    return new Promise(resolve => {
-      video.onloadedmetadata = () => resolve(video);
-    });
-  }
+/* AI knowledge (Tagalog) */
+const OBJECT_DETAILS = {
+  person: "Tao: isang buhay na nilalang.",
+  bottle: "Bote: lalagyan ng tubig o iba pang inumin.",
+  cellphone: "Cellphone: ginagamit sa komunikasyon, internet, at apps.",
+  laptop: "Laptop: portable na computer para sa trabaho o pag-aaral.",
+  chair: "Upuan: ginagamit sa pag-upo.",
+  book: "Aklat: pinagmumulan ng kaalaman o kwento."
+};
 
-  async function run() {
-    await setupCamera();
-    const model = await cocoSsd.load();
+async function setupCamera() {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: "environment" }
+  });
+  video.srcObject = stream;
+  return new Promise(resolve => {
+    video.onloadedmetadata = () => resolve();
+  });
+}
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+async function startAI() {
+  await setupCamera();
+  const model = await cocoSsd.load();
 
-    async function detect() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const predictions = await model.detect(video);
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
 
-      predictions.forEach(p => {
-        ctx.strokeStyle = 'lime';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(...p.bbox);
+  async function detect() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const predictions = await model.detect(video);
 
-        ctx.fillStyle = 'lime';
-        ctx.font = '16px Arial';
-        ctx.fillText(
-          `${p.class} (${Math.round(p.score * 100)}%)`,
-          p.bbox[0],
-          p.bbox[1] - 5
-        );
-      });
+    if (predictions.length > 0) {
+      const obj = predictions[0]; // pinakamalinaw na object
+      const label = obj.class;
 
-      requestAnimationFrame(detect);
+      ctx.strokeStyle = "lime";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(...obj.bbox);
+
+      ctx.fillStyle = "lime";
+      ctx.font = "18px Arial";
+      ctx.fillText(label, obj.bbox[0], obj.bbox[1] - 10);
+
+      infoBox.textContent =
+        OBJECT_DETAILS[label] || `Bagay na nakita: ${label}`;
+    } else {
+      infoBox.textContent = "Itutok ang camera sa isang bagay";
     }
 
-    detect();
+    requestAnimationFrame(detect);
   }
 
-  run();
+  detect();
+}
+
+startAI();
 </script>
 
 </body>
