@@ -1,56 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Augmented Reality</title>
-  <link rel="stylesheet" href="style.css">
+<html>
+  <head>
+    <title>My First Web AR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- QR Scanner Library -->
-  <script src="https://unpkg.com/html5-qrcode"></script>
-</head>
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
-<body>
+    <!-- AR.js -->
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.2.1/aframe/build/aframe-ar.js"></script>
+  </head>
 
-<header id="header">
-  <span>Scan the QR code</span>
-</header>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs>
+      
+      <!-- Marker -->
+      <a-marker preset="hiro">
+        <a-box position="0 0.5 0" material="color: red;"></a-box>
+      </a-marker>
 
-<main>
+      <!-- Camera -->
+      <a-entity camera></a-entity>
 
-  <button type="button" id="openCam">Open camera</button>
-
-  <!-- Camera preview -->
-  <div id="preview"></div>
-
-</main>
-
-<script>
-const openBtn = document.getElementById("openCam");
-let scanner;
-
-openBtn.addEventListener("click", () => {
-  scanner = new Html5Qrcode("preview");
-
-  scanner.start(
-    { facingMode: "environment" }, // back camera
-    {
-      fps: 10,
-      qrbox: 250
-    },
-    qrCodeMessage => {
-      console.log("QR Detected:", qrCodeMessage);
-
-      scanner.stop().then(() => {
-        window.location.href = qrCodeMessage;
-      });
-    },
-    error => {
-      // ignore scan errors
-    }
-  );
-});
-</script>
-
-</body>
+    </a-scene>
+  </body>
 </html>
